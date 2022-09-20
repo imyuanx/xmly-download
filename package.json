@@ -1,0 +1,14 @@
+{
+  "name": "xmly-download",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "yuanx <1220998011@qq.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node --trace-warnings main.js"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "crypto-js": "^4.1.1"
+  }
+}
