@@ -6,7 +6,9 @@
 
 # 配置
 
-配置`config.js`文件，填写`cookie`和`albumId`。
+防止`cookie`等敏感信息泄漏，请复制一份`config.js`文件并且重命名为`config-local.js`
+
+配置`config-local.js`文件，填写`cookie`和`albumId`。
 
 - `key` AES密钥，固定值无需修改
 - `cookie` 通过控制台获取
