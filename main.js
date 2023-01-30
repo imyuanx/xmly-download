@@ -139,7 +139,7 @@ function clearTitle(title){
 }
 
 async function main() {
-    const tracksList = await getTracksListAll(24);
+    const tracksList = await getTracksListAll();
     for (const tarckData of tracksList) {
         const { trackId, title } = tarckData;
         const title2 = await clearTitle(title);
