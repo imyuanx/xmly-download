@@ -139,20 +139,32 @@ function clearTitle(title){
 }
 
 async function main() {
-    const tracksList = await getTracksListAll();
+    const tracksList = await getTracksListAll(24);
+    let flgNeedDownload = true;
     for (const tarckData of tracksList) {
         const { trackId, title } = tarckData;
         const title2 = await clearTitle(title);
         const filename= `${output}/${title2}.${SUFFIX}`
-        if (!fs.existsSync(filename)) {
+        if (!fs.existsSync(filename) ) {
             console.log("文件不存在", filename);
-            const { data: { trackInfo: { playUrlList } } } = await getTrackInfo(trackId);
-                    let { url: playUrl } = playUrlList.find(playUrl => playUrl.type == mediaType);
-                    playUrl = decryptUrl(playUrl);
-                    console.log(playUrl);
-                    downloadMedia(playUrl, filename);
+            flgNeedDownload = true;
         }else{
-            console.log("文件存在", filename);
+            states = fs.statSync(filename); 
+            if(states.size > 0){
+                console.log("文件存在", filename);
+                flgNeedDownload = false;
+            }else{
+                console.log(filename,"文件存在,但是size为0,重新下载");
+                flgNeedDownload = true;
+            }
+
+        }
+        if (flgNeedDownload){
+            const { data: { trackInfo: { playUrlList } } } = await getTrackInfo(trackId);
+            let { url: playUrl } = playUrlList.find(playUrl => playUrl.type == mediaType);
+            playUrl = decryptUrl(playUrl);
+            console.log(playUrl);
+            downloadMedia(playUrl, filename);
         }
 
     }
