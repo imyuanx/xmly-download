@@ -28,7 +28,7 @@ function decryptUrl(ciphertext) {
 function getTracksList(pageNum = 1) {
     var config = {
         method: "get",
-        url: `https://www.ximalaya.com/revision/album/v1/getTracksList?albumId=${albumId}&pageNum=${pageNum}&sort=1`,
+        url: `https://www.ximalaya.com/revision/album/v1/getTracksList?albumId=${albumId}&pageNum=${pageNum}&pageSize=100&sort=0`,
         headers: {
             authority: "www.ximalaya.com",
             accept: "*/*",
@@ -106,10 +106,11 @@ function getTrackInfo(trackId) {
 /**
  * @desc 下载到本地
  * @param {String} playUrl 
- * @param {String} title 
+ * @param {String} filename 
  */
-function downloadMedia(playUrl, title) {
-    const stream = fs.createWriteStream(`${output}/${title}.${SUFFIX}`);
+function downloadMedia(playUrl, filename) {
+
+    const stream = fs.createWriteStream(filename);
     axios.get(playUrl, {
         responseType: 'arraybuffer'
     }).then((res) => {
@@ -117,20 +118,58 @@ function downloadMedia(playUrl, title) {
         stream.write(arraybuffer)
         stream.close();
     }, (err) => {
-        console.log(err);
+        console.log("下载错误",filename);
     });
+
+}
+
+function clearTitle(title){
+    title = title.replaceAll(":","");
+    title = title.replace(/【.*】/g, "");
+    title = title.replace(/《.*》/g, "");
+    title = title.replace(/（.*?）/g, "");
+    title = title.replace(/新书搜索.*?》/g, "");
+    title = title.replace('_新书搜索', "");
+    title = title.replace('新书搜索', "");
+
+    title = title.trim();
+    title = title.replaceAll(" ","_")
+    
+    return title;
 }
 
 async function main() {
     const tracksList = await getTracksListAll();
+    let flgNeedDownload = true;
     for (const tarckData of tracksList) {
         const { trackId, title } = tarckData;
-        const { data: { trackInfo: { playUrlList } } } = await getTrackInfo(trackId);
-        let { url: playUrl } = playUrlList.find(playUrl => playUrl.type == mediaType);
-        playUrl = decryptUrl(playUrl);
-        downloadMedia(playUrl, title);
+        const title2 = await clearTitle(title);
+        const filename= `${output}/${title2}.${SUFFIX}`
+        if (!fs.existsSync(filename) ) {
+            console.log("文件不存在", filename);
+            flgNeedDownload = true;
+        }else{
+            states = fs.statSync(filename); 
+            if(states.size > 0){
+                console.log("文件存在", filename);
+                flgNeedDownload = false;
+            }else{
+                console.log(filename,"文件存在,但是size为0,重新下载");
+                flgNeedDownload = true;
+            }
+
+        }
+        if (flgNeedDownload){
+            const { data: { trackInfo: { playUrlList } } } = await getTrackInfo(trackId);
+            let { url: playUrl } = playUrlList.find(playUrl => playUrl.type == mediaType);
+            playUrl = decryptUrl(playUrl);
+            console.log(playUrl);
+            downloadMedia(playUrl, filename);
+        }
+
     }
     console.log("success");
 }
+
 
 main();
