@@ -28,7 +28,7 @@ function decryptUrl(ciphertext) {
 function getTracksList(pageNum = 1) {
     var config = {
         method: "get",
-        url: `https://www.ximalaya.com/revision/album/v1/getTracksList?albumId=${albumId}&pageNum=${pageNum}&pageSize=100`,
+        url: `https://www.ximalaya.com/revision/album/v1/getTracksList?albumId=${albumId}&pageNum=${pageNum}&pageSize=100&sort=0`,
         headers: {
             authority: "www.ximalaya.com",
             accept: "*/*",
@@ -139,7 +139,7 @@ function clearTitle(title){
 }
 
 async function main() {
-    const tracksList = await getTracksListAll(24);
+    const tracksList = await getTracksListAll();
     let flgNeedDownload = true;
     for (const tarckData of tracksList) {
         const { trackId, title } = tarckData;
