@@ -2,7 +2,7 @@
   "name": "xmly-download",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "yuanx <1220998011@qq.com>",
+  "author": "yuanx <yuanx.me@qq.com>",
   "license": "MIT",
   "scripts": {
     "start": "node --trace-warnings main.js"
